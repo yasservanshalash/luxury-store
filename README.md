@@ -1,4 +1,4 @@
-# 🛍️ Venom Luxury Store
+# 🛍️ Line by Gizia Luxury Store
 
 A sophisticated luxury fashion e-commerce platform built with Next.js, PostgreSQL, and Stripe.
 
@@ -41,7 +41,7 @@ A sophisticated luxury fashion e-commerce platform built with Next.js, PostgreSQ
 ### 1. Clone and Install
 ```bash
 git clone <your-repo-url>
-cd venom
+cd line-by-gizia
 npm install
 ```
 
@@ -92,7 +92,7 @@ The database includes comprehensive models for:
 After seeding, you can login with:
 
 **Admin Account:**
-- Email: `admin@venom.com`
+- Email: `admin@linebygizia.com`
 - Password: `admin123`
 - Access: Full admin dashboard
 
@@ -113,7 +113,7 @@ The app uses a luxury design system with:
 ## 📁 Project Structure
 
 ```
-venom/
+line-by-gizia/
 ├── app/                  # Next.js App Router pages
 ├── components/           # Reusable UI components
 ├── lib/                  # Utility functions and configs
@@ -214,3 +214,4 @@ This project is private and proprietary.
 ---
 
 **Built with ❤️ for luxury fashion** # luxury-store
+# luxury-store
