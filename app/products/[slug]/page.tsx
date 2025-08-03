@@ -6,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
 import { useFavoritesStore } from '@/store/favoritesStore'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, getPlaceholderImage } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -88,7 +88,7 @@ export default function ProductPage({ params }: ProductPageProps) {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.images[0] || 'https://picsum.photos/400/600?random=1',
+      image: product.images[0] || getPlaceholderImage(400, 600),
       slug: product.slug,
       size: selectedSize,
       color: selectedColor,
@@ -144,7 +144,7 @@ export default function ProductPage({ params }: ProductPageProps) {
           <div className="space-y-4">
             <div className="aspect-w-3 aspect-h-4 bg-gray-100 rounded-lg overflow-hidden">
               <Image
-                src={product.images[selectedImage] || 'https://picsum.photos/600/800?random=1'}
+                src={product.images[selectedImage] || getPlaceholderImage(600, 800)}
                 alt={product.name}
                 width={600}
                 height={800}

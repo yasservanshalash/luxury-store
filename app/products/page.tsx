@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useFavoritesStore } from '@/store/favoritesStore'
+import { getPlaceholderImage } from '@/lib/utils'
 
 interface Product {
   id: string
@@ -168,7 +169,7 @@ export default function ProductsPage() {
                 <Link href={`/products/${product.slug}`}>
                   <div className="relative overflow-hidden">
                     <Image
-                      src={product.images[0] || 'https://picsum.photos/400/600?random=1'}
+                      src={product.images[0] || getPlaceholderImage(400, 600)}
                       alt={product.name}
                       width={400}
                       height={600}
@@ -190,7 +191,7 @@ export default function ProductsPage() {
                           slug: product.slug,
                           price: product.price,
                           comparePrice: product.comparePrice,
-                          image: product.images[0] || 'https://picsum.photos/400/600?random=1',
+                          image: product.images[0] || getPlaceholderImage(400, 600),
                           category: {
                             name: product.category.name,
                             slug: product.category.slug

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useCartStore } from '@/store/cartStore'
@@ -8,44 +8,15 @@ import { useCartStore } from '@/store/cartStore'
 export default function CheckoutSuccessPage() {
   const searchParams = useSearchParams()
   const { clearCart } = useCartStore()
-  const [isProcessing, setIsProcessing] = useState(true)
-  const sessionId = searchParams.get('session_id')
+  const orderId = searchParams.get('orderId')
+  const orderNumber = searchParams.get('orderNumber')
 
   useEffect(() => {
-    if (sessionId) {
-      // Clear the cart after successful payment
-      clearCart()
-      
-      // Optional: Send session verification to your backend
-      verifySession(sessionId)
-    }
-    setIsProcessing(false)
-  }, [sessionId, clearCart])
+    // Clear cart when page loads (already done in checkout)
+    clearCart()
+  }, [clearCart])
 
-  const verifySession = async (sessionId: string) => {
-    try {
-      await fetch('/api/checkout/success', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ session_id: sessionId }),
-      })
-    } catch (error) {
-      console.error('Error verifying session:', error)
-    }
-  }
 
-  if (isProcessing) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Processing your order...</p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,19 +45,22 @@ export default function CheckoutSuccessPage() {
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Your payment has been processed successfully. You will receive a confirmation email shortly with your order details and tracking information.
+            Your order has been placed successfully! You will receive a confirmation email shortly with your order details. Payment will be collected when your order is delivered.
           </p>
 
           {/* Order Info */}
-          {sessionId && (
+          {orderNumber && (
             <div className="bg-white rounded-lg shadow-sm p-6 max-w-md mx-auto mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Information</h2>
               <div className="text-sm text-gray-600">
                 <p className="mb-2">
-                  <span className="font-medium">Order ID:</span> {sessionId.slice(-8).toUpperCase()}
+                  <span className="font-medium">Order Number:</span> {orderNumber}
                 </p>
                 <p className="mb-2">
-                  <span className="font-medium">Status:</span> Processing
+                  <span className="font-medium">Payment Method:</span> Cash on Delivery
+                </p>
+                <p className="mb-2">
+                  <span className="font-medium">Status:</span> Pending
                 </p>
                 <p>
                   <span className="font-medium">Estimated Delivery:</span> 3-7 business days
@@ -115,13 +89,13 @@ export default function CheckoutSuccessPage() {
                 <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
                   <span className="text-xs font-medium text-blue-600">3</span>
                 </div>
-                <p>You'll receive tracking information once your order ships</p>
+                <p>Your order will be dispatched for delivery</p>
               </div>
               <div className="flex items-start space-x-3">
                 <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
                   <span className="text-xs font-medium text-blue-600">4</span>
                 </div>
-                <p>Enjoy your luxury items from Line by Gizia!</p>
+                <p>Pay with cash when your order arrives at your doorstep</p>
               </div>
             </div>
           </div>

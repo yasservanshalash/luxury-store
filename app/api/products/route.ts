@@ -4,35 +4,38 @@ import { prisma } from '@/lib/prisma'
 // Mock data for when database is not available
 const mockProducts = [
   {
-    id: '1',
-    name: 'Elegant Silk Dress',
-    slug: 'elegant-silk-dress',
-    description: 'A stunning silk dress perfect for special occasions',
-    price: 299,
-    comparePrice: 399,
-    images: ['https://picsum.photos/400/600?random=1'],
-    category: { name: 'Women', slug: 'women' },
-    variants: [
-      { name: 'Size', value: 'M' },
-      { name: 'Color', value: 'Black' }
-    ],
+    id: 'product-1',
+    name: 'Luxury Evening Gown',
+    slug: 'luxury-evening-gown',
+    description: 'Elegant black evening gown with intricate beadwork, perfect for special occasions.',
+    price: 890,
+    images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    category: {
+      id: 'women',
+      name: 'Women',
+      slug: 'women'
+    },
+    variants: [],
+    inventory: 15,
     isActive: true,
-    isFeatured: true
+    createdAt: '2024-01-01T00:00:00Z'
   },
   {
-    id: '2',
-    name: 'Classic Leather Jacket',
-    slug: 'classic-leather-jacket',
-    description: 'Premium leather jacket with timeless design',
-    price: 599,
-    images: ['https://picsum.photos/400/600?random=2'],
-    category: { name: 'Men', slug: 'men' },
-    variants: [
-      { name: 'Size', value: 'L' },
-      { name: 'Color', value: 'Brown' }
-    ],
+    id: 'product-2',
+    name: 'Designer Blazer',
+    slug: 'designer-blazer',
+    description: 'Sophisticated wool blazer with clean lines and impeccable tailoring.',
+    price: 650,
+    images: ['https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+    category: {
+      id: 'women',
+      name: 'Women',
+      slug: 'women'
+    },
+    variants: [],
+    inventory: 8,
     isActive: true,
-    isFeatured: false
+    createdAt: '2024-01-02T00:00:00Z'
   }
 ]
 
@@ -204,118 +207,141 @@ export async function GET(request: NextRequest) {
     const fallbackProducts = [
       {
         id: '1',
-        name: 'Silk Evening Dress',
-        slug: 'silk-evening-dress',
-        description: 'Exquisite silk evening dress with intricate beadwork',
-        price: 2499,
-        comparePrice: 3299,
-        images: ['https://picsum.photos/600/800?random=1', 'https://picsum.photos/600/800?random=2'],
-        sku: 'SED-001',
-        inventory: 15,
-        isActive: true,
-        isFeatured: true,
-        category: { id: '1', name: 'Women', slug: 'women' },
-        variants: [],
-        reviews: [],
+        name: 'Luxury Evening Gown',
+        slug: 'luxury-evening-gown',
+        description: 'Elegant evening gown crafted from the finest silk with hand-embroidered details. Perfect for galas and special occasions.',
+        price: 1250,
+        comparePrice: 1800,
+        images: ['https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'evening',
+          name: 'Evening Wear',
+          slug: 'evening'
+        },
+        variants: [
+          { id: 'size-xs', name: 'Size', value: 'XS', isActive: true },
+          { id: 'size-s', name: 'Size', value: 'S', isActive: true },
+          { id: 'size-m', name: 'Size', value: 'M', isActive: true },
+          { id: 'size-l', name: 'Size', value: 'L', isActive: true },
+          { id: 'color-black', name: 'Color', value: 'Black', isActive: true },
+          { id: 'color-navy', name: 'Color', value: 'Navy', isActive: true }
+        ],
+        inventory: 12,
         averageRating: 4.8,
-        _count: { reviews: 24 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        _count: { reviews: 24 }
       },
       {
         id: '2',
-        name: 'Cashmere Overcoat',
-        slug: 'cashmere-overcoat',
-        description: 'Luxurious cashmere overcoat with classic tailoring',
-        price: 3999,
-        images: ['https://picsum.photos/600/800?random=3', 'https://picsum.photos/600/800?random=4'],
-        sku: 'CO-001',
+        name: 'Cashmere Coat',
+        slug: 'cashmere-coat',
+        description: 'Luxurious double-breasted cashmere coat with silk lining. A timeless piece for the sophisticated woman.',
+        price: 980,
+        images: ['https://images.unsplash.com/photo-1544022613-e87ca75a784a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'outerwear',
+          name: 'Outerwear',
+          slug: 'outerwear'
+        },
+        variants: [
+          { id: 'size-xs-2', name: 'Size', value: 'XS', isActive: true },
+          { id: 'size-s-2', name: 'Size', value: 'S', isActive: true },
+          { id: 'size-m-2', name: 'Size', value: 'M', isActive: true },
+          { id: 'size-l-2', name: 'Size', value: 'L', isActive: true },
+          { id: 'color-camel', name: 'Color', value: 'Camel', isActive: true },
+          { id: 'color-charcoal', name: 'Color', value: 'Charcoal', isActive: true }
+        ],
         inventory: 8,
-        isActive: true,
-        isFeatured: true,
-        category: { id: '2', name: 'Men', slug: 'men' },
-        variants: [],
-        reviews: [],
         averageRating: 4.9,
-        _count: { reviews: 18 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        _count: { reviews: 16 }
       },
       {
         id: '3',
-        name: 'Diamond Tennis Bracelet',
-        slug: 'diamond-tennis-bracelet',
-        description: 'Stunning diamond tennis bracelet with premium stones',
-        price: 8999,
-        images: ['https://picsum.photos/600/800?random=5', 'https://picsum.photos/600/800?random=6'],
-        sku: 'DTB-001',
-        inventory: 5,
-        isActive: true,
-        isFeatured: false,
-        category: { id: '3', name: 'Accessories', slug: 'accessories' },
-        variants: [],
-        reviews: [],
-        averageRating: 5.0,
-        _count: { reviews: 12 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        name: 'Silk Cocktail Dress',
+        slug: 'silk-cocktail-dress',
+        description: 'Elegant midi dress in pure silk with a flattering A-line silhouette. Perfect for cocktail parties and dinner events.',
+        price: 420,
+        images: ['https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'dresses',
+          name: 'Dresses',
+          slug: 'dresses'
+        },
+        variants: [
+          { id: 'size-xs-3', name: 'Size', value: 'XS', isActive: true },
+          { id: 'size-s-3', name: 'Size', value: 'S', isActive: true },
+          { id: 'size-m-3', name: 'Size', value: 'M', isActive: true },
+          { id: 'size-l-3', name: 'Size', value: 'L', isActive: true },
+          { id: 'color-emerald', name: 'Color', value: 'Emerald', isActive: true },
+          { id: 'color-burgundy', name: 'Color', value: 'Burgundy', isActive: true }
+        ],
+        inventory: 15,
+        averageRating: 4.7,
+        _count: { reviews: 31 }
       },
       {
         id: '4',
-        name: 'Italian Leather Handbag',
-        slug: 'italian-leather-handbag',
-        description: 'Handcrafted Italian leather handbag',
-        price: 1899,
-        images: ['https://picsum.photos/600/800?random=7', 'https://picsum.photos/600/800?random=8'],
-        sku: 'ILH-001',
-        inventory: 12,
-        isActive: true,
-        isFeatured: false,
-        category: { id: '3', name: 'Accessories', slug: 'accessories' },
-        variants: [],
-        reviews: [],
-        averageRating: 4.7,
-        _count: { reviews: 31 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        name: 'Designer Handbag',
+        slug: 'designer-handbag',
+        description: 'Premium leather handbag with gold-tone hardware. Spacious interior with multiple compartments for organization.',
+        price: 750,
+        images: ['https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'accessories',
+          name: 'Accessories',
+          slug: 'accessories'
+        },
+        variants: [
+          { id: 'color-black-4', name: 'Color', value: 'Black', isActive: true },
+          { id: 'color-tan', name: 'Color', value: 'Tan', isActive: true },
+          { id: 'color-cognac', name: 'Color', value: 'Cognac', isActive: true }
+        ],
+        inventory: 20,
+        averageRating: 4.6,
+        _count: { reviews: 12 }
       },
       {
         id: '5',
-        name: 'Designer Sunglasses',
-        slug: 'designer-sunglasses',
-        description: 'Premium designer sunglasses with UV protection',
-        price: 799,
-        images: ['https://picsum.photos/600/800?random=9', 'https://picsum.photos/600/800?random=10'],
-        sku: 'DS-001',
-        inventory: 20,
-        isActive: true,
-        isFeatured: false,
-        category: { id: '3', name: 'Accessories', slug: 'accessories' },
-        variants: [],
-        reviews: [],
+        name: 'Elegant Blouse',
+        slug: 'elegant-blouse',
+        description: 'Sophisticated silk blouse with pearl button details. Versatile piece that transitions from day to evening.',
+        price: 280,
+        images: ['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'tops',
+          name: 'Tops',
+          slug: 'tops'
+        },
+        variants: [
+          { id: 'size-xs-5', name: 'Size', value: 'XS', isActive: true },
+          { id: 'size-s-5', name: 'Size', value: 'S', isActive: true },
+          { id: 'size-m-5', name: 'Size', value: 'M', isActive: true },
+          { id: 'size-l-5', name: 'Size', value: 'L', isActive: true },
+          { id: 'color-ivory', name: 'Color', value: 'Ivory', isActive: true },
+          { id: 'color-blush', name: 'Color', value: 'Blush', isActive: true }
+        ],
+        inventory: 25,
         averageRating: 4.5,
-        _count: { reviews: 8 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        _count: { reviews: 18 }
       },
       {
         id: '6',
-        name: 'Luxury Watch',
-        slug: 'luxury-watch',
-        description: 'Swiss-made luxury timepiece with automatic movement',
-        price: 12999,
-        images: ['https://picsum.photos/600/800?random=11', 'https://picsum.photos/600/800?random=12'],
-        sku: 'LW-001',
-        inventory: 3,
-        isActive: true,
-        isFeatured: true,
-        category: { id: '3', name: 'Accessories', slug: 'accessories' },
-        variants: [],
-        reviews: [],
-        averageRating: 4.9,
-        _count: { reviews: 15 },
-        createdAt: new Date(),
-        updatedAt: new Date()
+        name: 'Statement Earrings',
+        slug: 'statement-earrings',
+        description: 'Bold gold-plated earrings with crystal accents. Perfect for adding glamour to any outfit.',
+        price: 180,
+        images: ['https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80', 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'],
+        category: {
+          id: 'jewelry',
+          name: 'Jewelry',
+          slug: 'jewelry'
+        },
+        variants: [
+          { id: 'metal-gold', name: 'Metal', value: 'Gold', isActive: true },
+          { id: 'metal-silver', name: 'Metal', value: 'Silver', isActive: true }
+        ],
+        inventory: 30,
+        averageRating: 4.4,
+        _count: { reviews: 9 }
       }
     ]
 
@@ -328,8 +354,9 @@ export async function GET(request: NextRequest) {
       filteredProducts = filteredProducts.filter(p => p.category.slug === category)
     }
 
+    // Featured items filter (for our demo, we'll consider sale items as featured)
     if (featured) {
-      filteredProducts = filteredProducts.filter(p => p.isFeatured)
+      filteredProducts = filteredProducts.filter(p => p.comparePrice && p.comparePrice > p.price)
     }
 
     if (search) {
@@ -352,7 +379,7 @@ export async function GET(request: NextRequest) {
         filteredProducts.sort((a, b) => a.name.localeCompare(b.name))
         break
       case 'newest':
-        filteredProducts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        filteredProducts.sort((a, b) => b.id.localeCompare(a.id))
         break
       default:
         filteredProducts.sort((a, b) => a.name.localeCompare(b.name))

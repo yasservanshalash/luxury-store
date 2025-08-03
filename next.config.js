@@ -5,18 +5,13 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'via.placeholder.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**' }
+        , {
+          protocol: 'https',
+          hostname: 'picsum.photos',
+          pathname: '/**',
+    
       },
     ],
   },

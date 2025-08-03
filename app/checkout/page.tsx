@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useCartStore } from '@/store/cartStore'
 import { formatPrice, calculateLebaneseTax, calculateLebaneseshipping } from '@/lib/utils'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 // Lebanese governorates and cities
 const LEBANON_LOCATIONS = {
@@ -38,6 +39,7 @@ const OTHER_COUNTRIES = [
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCartStore()
   const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
   
   // Customer Information
   const [email, setEmail] = useState('')
@@ -53,8 +55,8 @@ export default function CheckoutPage() {
   const [apartment, setApartment] = useState('')
   const [postalCode, setPostalCode] = useState('')
   
-  // Payment
-  const [paymentMethod, setPaymentMethod] = useState('stripe')
+  // Payment - Whish only
+  const [paymentMethod] = useState('whish')
   
   // Calculations
   const subtotal = getTotalPrice()
@@ -68,6 +70,8 @@ export default function CheckoutPage() {
     }
   }, [items])
 
+  // No additional setup needed for cash on delivery
+
   const validatePhone = (phone: string, country: string): boolean => {
     if (country === 'LB') {
       // Lebanese phone validation: +961 followed by 1-9 and 6 more digits
@@ -77,117 +81,107 @@ export default function CheckoutPage() {
     return phone.length >= 8 // Basic validation for other countries
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const validateForm = (): boolean => {
+    if (!email || !firstName || !lastName || !phone || !address) {
+      alert('Please fill in all required fields')
+      return false
+    }
+
+    if (!validatePhone(phone, country)) {
+      alert('Please enter a valid phone number')
+      return false
+    }
+
+    if (country === 'LB' && (!governorate || !city)) {
+      alert('Please select governorate and city for Lebanese addresses')
+      return false
+    }
+
+    return true
+  }
+
+  const handleCashOnDeliveryOrder = async () => {
+    if (!validateForm()) return
+    
     setIsLoading(true)
-
+    
     try {
-      // Validate required fields
-      if (!email || !firstName || !lastName || !phone || !address) {
-        alert('Please fill in all required fields')
-        setIsLoading(false)
-        return
+      // Create order with cash on delivery
+      const orderData = {
+        email,
+        customerInfo: {
+          firstName,
+          lastName,
+          phone,
+        },
+        shippingAddress: {
+          firstName,
+          lastName,
+          address,
+          apartment,
+          city,
+          governorate,
+          postalCode,
+          country,
+          phone,
+        },
+        items: items.map(item => ({
+          productId: item.id,
+          variantId: item.selectedVariant?.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image,
+        })),
+        subtotal,
+        shipping,
+        tax,
+        total,
+        paymentMethod: 'cash_on_delivery',
       }
 
-      // Validate phone number
-      if (!validatePhone(phone, country)) {
-        alert('Please enter a valid phone number')
-        setIsLoading(false)
-        return
-      }
-
-      // For Lebanese addresses, require governorate and city
-      if (country === 'LB' && (!governorate || !city)) {
-        alert('Please select governorate and city for Lebanese addresses')
-        setIsLoading(false)
-        return
-      }
-
-      // Create checkout session with Stripe
-      const response = await fetch('/api/checkout', {
+      const response = await fetch('/api/orders/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          items: items.map(item => ({
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: item.name,
-                images: [item.image],
-                metadata: {
-                  variant: item.selectedVariant?.name || '',
-                  value: item.selectedVariant?.value || '',
-                }
-              },
-              unit_amount: Math.round(item.price * 100), // Convert to cents
-            },
-            quantity: item.quantity,
-          })),
-          customer_info: {
-            email,
-            name: `${firstName} ${lastName}`,
-            phone,
-          },
-          shipping_address: {
-            name: `${firstName} ${lastName}`,
-            address: {
-              line1: address,
-              line2: apartment,
-              city: country === 'LB' ? city : city,
-              state: country === 'LB' ? governorate : '',
-              postal_code: postalCode,
-              country: country,
-            }
-          },
-          shipping_amount: Math.round(shipping * 100),
-          tax_amount: Math.round(tax * 100),
-        }),
+        body: JSON.stringify(orderData),
       })
 
-      const data = await response.json()
-
-      if (data.url) {
-        // Redirect to Stripe Checkout
-        window.location.href = data.url
-      } else {
-        throw new Error(data.error || 'Failed to create checkout session')
+      if (!response.ok) {
+        throw new Error('Failed to create order')
       }
+
+      const { orderId, orderNumber } = await response.json()
+      
+      // Clear cart and redirect to success page
+      clearCart()
+      router.push(`/checkout/success?orderId=${orderId}&orderNumber=${orderNumber}`)
+      
     } catch (error) {
-      console.error('Checkout error:', error)
-      alert('Something went wrong. Please try again.')
+      console.error('Order creation failed:', error)
+      alert('Failed to create order. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  const availableCities = country === 'LB' && governorate ? LEBANON_LOCATIONS[governorate as keyof typeof LEBANON_LOCATIONS] || [] : []
-
-  if (items.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-light text-gray-900 mb-4">Your cart is empty</h2>
-          <p className="text-gray-600 mb-8">Add some items to your cart to proceed with checkout</p>
-          <a href="/products" className="inline-block bg-gray-900 text-white px-8 py-3 hover:bg-gray-800 transition-colors">
-            Continue Shopping
-          </a>
-        </div>
-      </div>
-    )
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleCashOnDeliveryOrder()
   }
 
+  // Simple checkout flow - no external payment processing needed for COD
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-light text-gray-900">Checkout</h1>
-          <p className="mt-2 text-gray-600">Complete your order below</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-thin tracking-wider text-gray-900 mb-8 text-center">
+          Checkout
+        </h1>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Customer Information & Shipping */}
+          {/* Left Column - Customer Info */}
           <div className="space-y-8">
             {/* Customer Information */}
             <div className="bg-white rounded-lg shadow-sm p-6">
@@ -203,7 +197,7 @@ export default function CheckoutPage() {
                     id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                     required
                   />
                 </div>
@@ -218,10 +212,11 @@ export default function CheckoutPage() {
                       id="firstName"
                       value={firstName}
                       onChange={(e) => setFirstName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                       required
                     />
                   </div>
+                  
                   <div>
                     <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
                       Last Name *
@@ -231,7 +226,7 @@ export default function CheckoutPage() {
                       id="lastName"
                       value={lastName}
                       onChange={(e) => setLastName(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                       required
                     />
                   </div>
@@ -246,8 +241,8 @@ export default function CheckoutPage() {
                     id="phone"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder={country === 'LB' ? '+961 1 234 567' : 'Your phone number'}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    placeholder={country === 'LB' ? '+961 70 123 456' : '+1 234 567 8900'}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                     required
                   />
                 </div>
@@ -271,11 +266,13 @@ export default function CheckoutPage() {
                       setGovernorate('')
                       setCity('')
                     }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                     required
                   >
-                    {OTHER_COUNTRIES.map(c => (
-                      <option key={c.code} value={c.code}>{c.name}</option>
+                    {OTHER_COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.name}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -293,12 +290,14 @@ export default function CheckoutPage() {
                           setGovernorate(e.target.value)
                           setCity('')
                         }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                         required
                       >
                         <option value="">Select Governorate</option>
-                        {Object.keys(LEBANON_LOCATIONS).map(gov => (
-                          <option key={gov} value={gov}>{gov}</option>
+                        {Object.keys(LEBANON_LOCATIONS).map((gov) => (
+                          <option key={gov} value={gov}>
+                            {gov}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -311,13 +310,15 @@ export default function CheckoutPage() {
                         id="city"
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                         required
                         disabled={!governorate}
                       >
                         <option value="">Select City</option>
-                        {availableCities.map(cityName => (
-                          <option key={cityName} value={cityName}>{cityName}</option>
+                        {governorate && LEBANON_LOCATIONS[governorate as keyof typeof LEBANON_LOCATIONS]?.map((c) => (
+                          <option key={c} value={c}>
+                            {c}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -326,15 +327,15 @@ export default function CheckoutPage() {
 
                 {country !== 'LB' && (
                   <div>
-                    <label htmlFor="cityInput" className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-1">
                       City *
                     </label>
                     <input
                       type="text"
-                      id="cityInput"
+                      id="city"
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                       required
                     />
                   </div>
@@ -342,14 +343,14 @@ export default function CheckoutPage() {
 
                 <div>
                   <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">
-                    Street Address *
+                    Address *
                   </label>
                   <input
                     type="text"
                     id="address"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                     required
                   />
                 </div>
@@ -363,7 +364,7 @@ export default function CheckoutPage() {
                     id="apartment"
                     value={apartment}
                     onChange={(e) => setApartment(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                   />
                 </div>
 
@@ -376,31 +377,38 @@ export default function CheckoutPage() {
                     id="postalCode"
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Payment Method */}
+            {/* Payment Method - Cash on Delivery */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Payment Method</h2>
-              <div className="space-y-3">
-                <label className="flex items-center">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="stripe"
-                    checked={paymentMethod === 'stripe'}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="mr-3"
-                  />
-                  <span>Credit Card (Stripe)</span>
-                </label>
+              
+              <div className="p-4 border border-green-500 bg-green-50 rounded-lg">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-green-500 rounded flex items-center justify-center text-white mr-3">
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-900">Cash on Delivery</div>
+                    <div className="text-sm text-gray-600">💵 Pay with cash when your order arrives</div>
+                  </div>
+                  <div className="ml-auto w-4 h-4 rounded-full border-2 border-green-500 bg-green-500">
+                    <div className="w-2 h-2 bg-white rounded-full m-0.5"></div>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-500 mt-3">
-                Your payment information will be processed securely by Stripe.
-              </p>
+              
+              <div className="mt-4 p-3 bg-blue-50 rounded-md">
+                <p className="text-sm text-blue-800">
+                  ℹ️ Please have the exact amount ready when your order arrives. Our delivery team will collect payment upon delivery.
+                </p>
+              </div>
             </div>
           </div>
 
@@ -476,9 +484,9 @@ export default function CheckoutPage() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-6 bg-gray-900 text-white py-4 px-6 hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full mt-6 py-4 px-6 text-white bg-green-600 hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Processing...' : `Complete Order - ${formatPrice(total)}`}
+                {isLoading ? 'Creating Order...' : `Place Order - ${formatPrice(total)} (Cash on Delivery)`}
               </button>
 
               <p className="text-xs text-gray-500 text-center mt-3">

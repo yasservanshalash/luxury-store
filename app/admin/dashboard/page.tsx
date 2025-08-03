@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import AdminLayout from '@/components/admin/AdminLayout'
 import Link from 'next/link'
 
@@ -24,31 +24,82 @@ export default function AdminDashboard() {
   })
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    // Simulate API call - replace with real API
-    setTimeout(() => {
-      setStats({
-        totalRevenue: 45250.50,
-        totalOrders: 127,
-        totalProducts: 24,
-        totalCustomers: 89,
-        recentOrders: [
-          { id: 'ORD-001', customer: 'Lara Khalil', amount: 485.00, status: 'paid', date: '2025-01-20' },
-          { id: 'ORD-002', customer: 'Ahmad Mansour', amount: 1250.00, status: 'processing', date: '2025-01-20' },
-          { id: 'ORD-003', customer: 'Nour Sabbagh', amount: 750.00, status: 'shipped', date: '2025-01-19' },
-          { id: 'ORD-004', customer: 'Rami Khoury', amount: 320.00, status: 'paid', date: '2025-01-19' },
-          { id: 'ORD-005', customer: 'Maya Fares', amount: 890.00, status: 'processing', date: '2025-01-18' },
-        ],
-        topProducts: [
-          { name: 'Beirut Silk Blouse', sales: 45, revenue: 21825 },
-          { name: 'Cashmere Wrap Coat', sales: 12, revenue: 15000 },
-          { name: 'Line by Gizia Little Black Dress', sales: 23, revenue: 11270 },
-          { name: 'Lebanese Cedar Scarf', sales: 18, revenue: 5400 },
-        ]
+  const fetchDashboardData = useCallback(async () => {
+    try {
+      setLoading(true)
+      
+      // Fetch analytics data
+      const analyticsResponse = await fetch('/api/admin/analytics?' + new Date().getTime(), {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        }
       })
+      
+      // Fetch orders data
+      const ordersResponse = await fetch('/api/admin/orders')
+      
+      // Fetch products data
+      const productsResponse = await fetch('/api/admin/products')
+      
+      // Fetch customers data
+      const customersResponse = await fetch('/api/admin/customers')
+
+      if (analyticsResponse.ok && ordersResponse.ok && productsResponse.ok && customersResponse.ok) {
+        const analytics = await analyticsResponse.json()
+        const ordersData = await ordersResponse.json()
+        const productsData = await productsResponse.json()
+        const customersData = await customersResponse.json()
+
+        // Get recent orders (last 5)
+        const recentOrders = ordersData.orders.slice(0, 5).map((order: any) => ({
+          id: order.orderNumber,
+          customer: order.customer.name,
+          amount: order.total,
+          status: order.paymentStatus,
+          date: new Date(order.createdAt).toISOString().split('T')[0],
+        }))
+
+        setStats({
+          totalRevenue: analytics.revenue?.current || 0,
+          totalOrders: analytics.orders?.current || 0,
+          totalProducts: productsData.products?.length || 0,
+          totalCustomers: analytics.customers?.current || 0,
+          recentOrders: recentOrders,
+          topProducts: analytics.topProducts || []
+        })
+      } else {
+        // Fallback to empty data if APIs fail
+        setStats({
+          totalRevenue: 0,
+          totalOrders: 0,
+          totalProducts: 0,
+          totalCustomers: 0,
+          recentOrders: [],
+          topProducts: []
+        })
+      }
+      
       setLoading(false)
-    }, 1000)
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error)
+      setLoading(false)
+      
+      // Fallback to empty data
+      setStats({
+        totalRevenue: 0,
+        totalOrders: 0,
+        totalProducts: 0,
+        totalCustomers: 0,
+        recentOrders: [],
+        topProducts: []
+      })
+    }
   }, [])
+
+  useEffect(() => {
+    fetchDashboardData()
+  }, [fetchDashboardData])
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -90,9 +141,25 @@ export default function AdminDashboard() {
   return (
     <AdminLayout>
       <div className="p-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-thin tracking-wider text-gray-900">Welcome back, Line by Gizia Admin</h1>
-          <p className="text-gray-600 mt-2">Here's what's happening with your luxury fashion store today.</p>
+        <div className="mb-8 sm:flex sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-thin tracking-wider text-gray-900">Welcome back, Line by Gizia Admin</h1>
+            <p className="text-gray-600 mt-2">Here's what's happening with your luxury fashion store today.</p>
+          </div>
+          <div className="mt-4 sm:mt-0">
+            <button
+              onClick={() => {
+                setLoading(true)
+                fetchDashboardData()
+              }}
+              className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-900"
+            >
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh Data
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}

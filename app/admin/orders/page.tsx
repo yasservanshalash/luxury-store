@@ -46,7 +46,20 @@ export default function AdminOrdersPage() {
 
   const fetchOrders = async () => {
     try {
-      // Simulate API call - replace with real API
+      const response = await fetch('/api/admin/orders', {
+        method: 'GET',
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setOrders(data.orders || [])
+        setLoading(false)
+      } else {
+        throw new Error('Failed to fetch orders')
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error)
+      // Fallback to mock data
       setTimeout(() => {
         setOrders([
           {
@@ -184,9 +197,38 @@ export default function AdminOrdersPage() {
         ])
         setLoading(false)
       }, 1000)
+    }
+  }
+
+  const updateOrderStatus = async (orderId: string, status: string, type: 'status' | 'paymentStatus' | 'fulfillmentStatus') => {
+    try {
+      const updateData: any = {}
+      updateData[type] = status
+
+      const response = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId,
+          ...updateData,
+        }),
+      })
+
+      if (response.ok) {
+        // Update local state
+        setOrders(orders.map(order => 
+          order.id === orderId 
+            ? { ...order, [type]: status }
+            : order
+        ))
+      } else {
+        alert('Failed to update order status')
+      }
     } catch (error) {
-      console.error('Error fetching orders:', error)
-      setLoading(false)
+      console.error('Error updating order:', error)
+      alert('Error updating order status')
     }
   }
 
@@ -403,7 +445,7 @@ export default function AdminOrdersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <select
                         value={order.status}
-                        onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value, 'status')}
                         className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getStatusColor(order.status)}`}
                       >
                         <option value="pending">Pending</option>
@@ -414,9 +456,16 @@ export default function AdminOrdersPage() {
                       </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(order.paymentStatus)}`}>
-                        {order.paymentStatus}
-                      </span>
+                      <select
+                        value={order.paymentStatus}
+                        onChange={(e) => updateOrderStatus(order.id, e.target.value, 'paymentStatus')}
+                        className={`text-xs font-medium rounded-full px-2.5 py-0.5 border-0 ${getPaymentStatusColor(order.paymentStatus)}`}
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                      </select>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(order.createdAt)}
