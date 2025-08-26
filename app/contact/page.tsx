@@ -80,20 +80,18 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-sm font-light tracking-wider uppercase text-gray-500 mb-2">ADDRESS</h3>
                 <p className="text-gray-900 font-light">
-                  Beirut Central District<br />
-                  Saifi Village, Beirut<br />
-                  Lebanon
+                  Kaslik Lebanon
                 </p>
               </div>
               
               <div>
                 <h3 className="text-sm font-light tracking-wider uppercase text-gray-500 mb-2">PHONE</h3>
-                <p className="text-gray-900 font-light">+961 1 123 456</p>
+                <p className="text-gray-900 font-light">81088848</p>
               </div>
               
               <div>
                 <h3 className="text-sm font-light tracking-wider uppercase text-gray-500 mb-2">EMAIL</h3>
-                <p className="text-gray-900 font-light">hello@linebygizia.com</p>
+                <p className="text-gray-900 font-light">linebygizia@gmail.com</p>
               </div>
               
               <div>

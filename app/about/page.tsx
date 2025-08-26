@@ -110,7 +110,7 @@ export default function AboutPage() {
             <div className="text-center group">
               <div className="relative h-64 mb-6 overflow-hidden rounded-lg">
                 <Image
-                  src="https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   alt="Contemporary women's fashion design"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-500"

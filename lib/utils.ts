@@ -17,7 +17,7 @@ export function getPlaceholderImage(width: number = 400, height: number = 600): 
   const luxuryWomenImages = [
     'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop', // Evening gown
     'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop', // Designer coat
-    'https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop', // Cocktail dress
+    'https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop', // Cocktail dress
     'https://images.unsplash.com/photo-1544022613-e87ca75a784a?ixlib=rb-4.0.3&auto=format&fit=crop', // Blazer
     'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop', // Elegant blouse
     'https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop', // Designer handbag

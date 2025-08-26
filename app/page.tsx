@@ -25,7 +25,7 @@ export default function HomePage() {
       id: 3,
       name: 'Silk Cocktail Dress',
       price: 420,
-      image: 'https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      image: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       slug: 'silk-cocktail-dress'
     },
     {
@@ -48,6 +48,35 @@ export default function HomePage() {
       price: 750,
       image: 'https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
       slug: 'designer-handbag'
+      
+    }
+  ]
+
+  // Instagram Gallery Images - Using previous working URLs
+  const instagramImages = [
+    {
+      url: 'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Luxury Lebanese Fashion'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Elegant Evening Wear'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1544022613-e87ca75a784a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Designer Outerwear'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Contemporary Blouses'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Luxury Accessories'
+    },
+    {
+      url: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+      alt: 'Line by Gizia - Luxury Gowns'
     }
   ]
 
@@ -167,7 +196,7 @@ export default function HomePage() {
             <div className="group cursor-pointer">
               <div className="relative h-80 mb-4 overflow-hidden">
                 <Image
-                  src="https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                  src="https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
                   alt="Evening Collection - Luxury Dresses"
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-700"
@@ -286,63 +315,52 @@ export default function HomePage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-thin tracking-wider text-gray-900 mb-4">
-              @LINEBYGIZIA
-            </h2>
+            <a 
+              href="https://www.instagram.com/line_by_gizia/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="group"
+            >
+              <h2 className="text-4xl font-thin tracking-wider text-gray-900 mb-4 group-hover:text-gray-600 transition-colors">
+                @LINE_BY_GIZIA
+              </h2>
+            </a>
             <p className="text-gray-600 text-lg">
-              Follow us for daily style inspiration
+              Follow us for daily style inspiration from Lebanon
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 1"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1566479179817-623b4e5d64e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 2"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1544022613-e87ca75a784a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 3"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 4"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1559563458-527698bf5295?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 5"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
-            <div className="aspect-square relative overflow-hidden">
-              <Image
-                src="https://images.unsplash.com/photo-1595777457583-95e059d581b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                alt="Instagram Post 6"
-                fill
-                className="object-cover hover:scale-105 transition-transform duration-300"
-              />
-            </div>
+            {/* Dynamic Instagram Gallery */}
+            {instagramImages.map((image, index) => (
+              <a 
+                key={index}
+                href="https://www.instagram.com/line_by_gizia/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="aspect-square relative overflow-hidden group cursor-pointer"
+              >
+                <Image
+                  src={image.url}
+                  alt={image.alt}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300"></div>
+              </a>
+            ))}
+          </div>
+          
+          {/* Call to Action */}
+          <div className="text-center mt-12">
+            <a
+              href="https://www.instagram.com/line_by_gizia/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block bg-gray-900 text-white px-8 py-3 text-sm font-light tracking-wider uppercase hover:bg-gray-800 transition-colors duration-300"
+            >
+              Follow @LINE_BY_GIZIA
+            </a>
           </div>
         </div>
       </section>
