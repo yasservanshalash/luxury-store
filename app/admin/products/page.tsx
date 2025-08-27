@@ -144,8 +144,23 @@ export default function AdminProductsPage() {
 
   const handleDelete = async (productId: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
-      // Delete product - replace with real API call
-      setProducts(prev => prev.filter(p => p.id !== productId))
+      try {
+        const response = await fetch(`/api/admin/products/${productId}`, {
+          method: 'DELETE',
+        })
+
+        if (response.ok) {
+          // Remove from local state only after successful API call
+          setProducts(prev => prev.filter(p => p.id !== productId))
+          alert('Product deleted successfully!')
+        } else {
+          const error = await response.json()
+          alert(`Error deleting product: ${error.message || 'Unknown error'}`)
+        }
+      } catch (error) {
+        console.error('Error deleting product:', error)
+        alert('Error deleting product. Please try again.')
+      }
     }
   }
 

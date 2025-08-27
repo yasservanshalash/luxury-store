@@ -33,6 +33,8 @@ export default function ProductsPage() {
   const { addToFavorites, removeFromFavorites, isFavorited } = useFavoritesStore()
   const searchParams = useSearchParams()
 
+  // Products state effect removed for production
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -57,11 +59,28 @@ export default function ProductsPage() {
           params.append('sort', sort)
         }
         
+        console.log('🔍 Fetching products from:', `/api/products?${params}`)
         const response = await fetch(`/api/products?${params}`)
+        console.log('📡 Response status:', response.status)
+        
         const data = await response.json()
+        console.log('📦 Raw API response:', data)
+        console.log('✅ Success status:', data.success)
+        console.log('📊 Data array length:', data.data?.length)
+        console.log('🏷️ First product:', data.data?.[0])
         
         if (data.success) {
-          setProducts(data.data)
+          // Transform the data to match the frontend interface
+          const transformedProducts = data.data.map((product: any) => ({
+            ...product,
+            price: parseFloat(product.price),
+            comparePrice: product.comparePrice ? parseFloat(product.comparePrice) : undefined
+          }))
+          console.log('🔄 Transformed products:', transformedProducts.length, transformedProducts[0])
+          setProducts(transformedProducts)
+          console.log('🎯 Products state updated with:', transformedProducts.length, 'items')
+        } else {
+          console.error('❌ API returned error:', data)
         }
       } catch (error) {
         console.error('Error fetching products:', error)

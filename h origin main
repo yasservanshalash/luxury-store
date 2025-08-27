@@ -1,0 +1,5 @@
+[33m209fc06e[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m checkpoint
+[33m68405781[m Remove all fallback/mock data from products API - now shows empty when database is empty
+[33m258aabc0[m Remove all mock data, connect dashboard to real database, fix COD implementation
+[33ma041ddb9[m Complete Line by Gizia luxury store with admin panel
+[33m3524beb8[m first commit
